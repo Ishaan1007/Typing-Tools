@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Writing Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { background-color: #f8f9fa; }
+    textarea { resize: vertical; }
+    .tab-content { margin-top: 20px; }
+    .spinner-border { width: 1.5rem; height: 1.5rem; }
+  </style>
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.1';
+
+    let summarizer, grammarFixer, qaGenerator, translator;
+
+    async function loadModels() {
+      document.getElementById('status').innerText = '⏳ Loading models...';
+      summarizer = await pipeline('summarization', 'Xenova/distilbart-cnn-6-6');
+      grammarFixer = await pipeline('text2text-generation', 'Xenova/vennify/t5-base-grammar-correction');
+      qaGenerator = await pipeline('text2text-generation', 'Xenova/lmqg-t5-base-squad-qag');
+      translator = await pipeline('translation', 'Xenova/opus-mt-hi-en');
+      document.getElementById('status').innerText = '✅ Models loaded. Ready to use!';
+    }
+
+    async function runEditorTask(task) {
+      const input = document.getElementById('editor-input').value.trim();
+      const outputDiv = document.getElementById('editor-output');
+      const button = document.getElementById(`${task}-btn`);
+
+      if (!input) {
+        outputDiv.innerHTML = '<div class="alert alert-warning">Please enter some text.</div>';
+        return;
+      }
+
+      button.disabled = true;
+      button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Processing...`;
+      outputDiv.innerHTML = '';
+
+      let result;
+      if (task === 'summarize') {
+        result = await summarizer(input, { max_length: 130, min_length: 30 });
+        outputDiv.innerHTML = `<h5>Summary:</h5><p>${result[0].summary_text}</p>`;
+      } else if (task === 'grammar') {
+        result = await grammarFixer(`grammar: ${input}`);
+        outputDiv.innerHTML = `<h5>Corrected Text:</h5><p>${result[0].generated_text}</p>`;
+      } else if (task === 'qa') {
+        result = await qaGenerator(`generate questions: ${input}`);
+        const lines = result[0].generated_text.split('\n').filter(Boolean);
+        let html = `<h5>Generated Q&A Pairs:</h5>`;
+        for (let line of lines) {
+          const [q, a] = line.split('?').map(s => s.trim());
+          if (q && a) {
+            html += `<p><strong>Q:</strong> ${q}?</p><p><strong>A:</strong> ${a}</p><hr/>`;
+          }
+        }
+        outputDiv.innerHTML = html;
+      }
+
+      button.disabled = false;
+      button.innerText = 'Run';
+    }
+
+    async function runTranslation() {
+      const input = document.getElementById('translate-input').value.trim();
+      const outputDiv = document.getElementById('translate-output');
+      const button = document.getElementById('translate-btn');
+
+      if (!input) {
+        outputDiv.innerHTML = '<div class="alert alert-warning">Please enter Hinglish text.</div>';
+        return;
+      }
+
+      button.disabled = true;
+      button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Translating...`;
+      const result = await translator(input);
+      outputDiv.innerHTML = `<h5>Translation:</h5><p>${result[0].translation_text}</p>`;
+      button.disabled = false;
+      button.innerText = 'Translate';
+    }
+
+    function speakOutput() {
+      const content = document.getElementById('editor-output').innerText;
+      if (!content) return alert('No content to read.');
+      const utterance = new SpeechSynthesisUtterance(content);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const content = document.getElementById('editor-output').innerText || 'No content to export.';
+      doc.text(content, 10, 10);
+      doc.save('ai-output.pdf');
+    }
+
+    window.addEventListener('DOMContentLoaded', loadModels);
+    window.runEditorTask = runEditorTask;
+    window.runTranslation = runTranslation;
+    window.speakOutput = speakOutput;
+    window.exportToPDF = exportToPDF;
+  </script>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="text-center mb-4">🧠 AI Writing Assistant</h1>
+    <div id="status" class="text-muted text-center mb-4">Loading models...</div>
+
+    <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#editor-tab">✍️ Editor</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tools-tab">🛠️ Tools</button></li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Editor Tab -->
+      <div class="tab-pane fade show active" id="editor-tab">
+        <div class="mt-4">
+          <textarea id="editor-input" class="form-control" rows="8" placeholder="Paste or type your content here..."></textarea>
+          <div class="d-flex flex-wrap gap-3 mt-3">
+            <button id="summarize-btn" class="btn btn-primary" onclick="runEditorTask('summarize')">Summarize</button>
+            <button id="grammar-btn" class="btn btn-warning" onclick="runEditorTask('grammar')">Fix Grammar</button>
+            <button id="qa-btn" class="btn btn-info" onclick="runEditorTask('qa')">Generate Q&A</button>
+            <button class="btn btn-outline-dark" onclick="exportToPDF()">📄 Export to PDF</button>
+            <button class="btn btn-outline-primary" onclick="speakOutput()">🔊 Audio Overview</button>
+          </div>
+          <div id="editor-output" class="mt-4"></div>
+        </div>
+      </div>
+
+      <!-- Tools Tab -->
+      <div class="tab-pane fade" id="tools-tab">
+        <div class="mt-4">
+          <label for="translate-input" class="form-label">Hinglish → English Translator</label>
+          <textarea id="translate-input" class="form-control" rows="5" placeholder="e.g., mera naam Ishaan hai"></textarea>
+          <button id="translate-btn" class="btn btn-success mt-3" onclick="runTranslation()">Translate</button>
+          <div id="translate-output" class="mt-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
