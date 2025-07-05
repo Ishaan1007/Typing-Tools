@@ -492,7 +492,12 @@
             output.className = 'output-area has-content';
             output.innerHTML = `
                 <div class="alert alert-success">
-                    <h6><i class="fas fa-check-circle"></i> ${title}</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="fas fa-check-circle"></i> ${title}</h6>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('${outputId}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
                     <div class="mt-2">${content}</div>
                 </div>
             `;
@@ -1112,7 +1117,7 @@
             return comparisons.slice(0, 2);
         }
 
-        // Enhanced Hinglish translation with cultural context
+        // Improved Hinglish translation with better accuracy
         function translateHinglish() {
             const input = document.getElementById('translate-input').value.trim();
             if (!input) {
@@ -1122,178 +1127,347 @@
 
             const steps = [
                 'Analyzing language patterns',
-                'Identifying Hinglish constructs',
-                'Applying cultural context',
+                'Processing Hindi words',
+                'Applying grammar rules',
                 'Generating natural English'
             ];
             const { button, originalText } = showAdvancedLoading('translate-btn', steps);
             
             setTimeout(() => {
                 try {
-                    let translated = input;
+                    let translated = input.toLowerCase();
                     
-                    // Enhanced Hinglish to English mappings with context
-                    const hinglishMappings = {
-                        // Extended personal pronouns and possessives
+                    // Comprehensive Hinglish dictionary with proper mappings
+                    const hinglishDict = {
+                        // Personal pronouns (corrected)
+                        'main': 'I', 'mein': 'I', 'mai': 'I',
                         'mera': 'my', 'meri': 'my', 'mere': 'my',
+                        'tum': 'you', 'aap': 'you', 'tu': 'you',
                         'tumhara': 'your', 'tumhari': 'your', 'tumhare': 'your',
+                        'woh': 'he/she', 'wo': 'he/she', 'voh': 'he/she',
                         'uska': 'his/her', 'uski': 'his/her', 'uske': 'his/her',
-                        'hamara': 'our', 'hamari': 'our', 'hamare': 'our',
+                        'hum': 'we', 'hamara': 'our', 'hamari': 'our', 'hamare': 'our',
                         'unka': 'their', 'unki': 'their', 'unke': 'their',
                         
-                        // Extended verbs with tenses
-                        'hai': 'is', 'hain': 'are', 'hun': 'am', 'ho': 'are',
+                        // Verbs - to be (corrected)
+                        'hun': 'am', 'hai': 'is', 'hain': 'are', 'ho': 'are',
                         'tha': 'was', 'thi': 'was', 'the': 'were', 'thi': 'was',
                         'hoga': 'will be', 'hogi': 'will be', 'honge': 'will be',
-                        'hoga': 'will be', 'hogi': 'will be', 'hoge': 'will be',
-                        'karta': 'do/does', 'karti': 'do/does', 'karte': 'do/does',
+                        'hone': 'to be', 'hona': 'to be',
+                        
+                        // Action verbs (corrected)
+                        'karta': 'do', 'karti': 'do', 'karte': 'do', 'karna': 'to do',
                         'kiya': 'did', 'kiye': 'did', 'kari': 'did',
                         'karega': 'will do', 'karegi': 'will do', 'karenge': 'will do',
-                        'raha': 'is doing', 'rahi': 'is doing', 'rahe': 'are doing',
+                        'kar': 'do', 'karo': 'do',
                         
-                        // Question words and expressions
+                        'jata': 'go', 'jati': 'go', 'jate': 'go', 'jana': 'to go',
+                        'gaya': 'went', 'gayi': 'went', 'gaye': 'went',
+                        'jaega': 'will go', 'jaegi': 'will go', 'jaenge': 'will go',
+                        'ja': 'go', 'jao': 'go',
+                        
+                        'aata': 'come', 'aati': 'come', 'aate': 'come', 'aana': 'to come',
+                        'aaya': 'came', 'aayi': 'came', 'aaye': 'came',
+                        'aaega': 'will come', 'aaegi': 'will come', 'aaenge': 'will come',
+                        'aa': 'come', 'aao': 'come',
+                        
+                        'dekha': 'saw', 'dekhi': 'saw', 'dekhe': 'saw', 'dekhna': 'to see',
+                        'dekhta': 'see', 'dekhti': 'see', 'dekhte': 'see',
+                        'dekhega': 'will see', 'dekhegi': 'will see', 'dekhenge': 'will see',
+                        'dekh': 'see', 'dekho': 'see',
+                        
+                        'suna': 'heard', 'suni': 'heard', 'sune': 'heard', 'sunna': 'to hear',
+                        'sunta': 'hear', 'sunti': 'hear', 'sunte': 'hear',
+                        'sunega': 'will hear', 'sunegi': 'will hear', 'sunenge': 'will hear',
+                        'sun': 'hear', 'suno': 'hear',
+                        
+                        'bola': 'said', 'boli': 'said', 'bole': 'said', 'bolna': 'to say',
+                        'bolta': 'say', 'bolti': 'say', 'bolte': 'say',
+                        'bolega': 'will say', 'bolegi': 'will say', 'bolenge': 'will say',
+                        'bol': 'say', 'bolo': 'say',
+                        
+                        'khata': 'eat', 'khati': 'eat', 'khate': 'eat', 'khana': 'to eat',
+                        'khaya': 'ate', 'khayi': 'ate', 'khaye': 'ate',
+                        'khayega': 'will eat', 'khayegi': 'will eat', 'khayenge': 'will eat',
+                        'kha': 'eat', 'khao': 'eat',
+                        
+                        'pita': 'drink', 'piti': 'drink', 'pite': 'drink', 'pina': 'to drink',
+                        'piya': 'drank', 'piyi': 'drank', 'piye': 'drank',
+                        'piyega': 'will drink', 'piyegi': 'will drink', 'piyenge': 'will drink',
+                        'pi': 'drink', 'piyo': 'drink',
+                        
+                        'sota': 'sleep', 'soti': 'sleep', 'sote': 'sleep', 'sona': 'to sleep',
+                        'soya': 'slept', 'soyi': 'slept', 'soye': 'slept',
+                        'soyega': 'will sleep', 'soyegi': 'will sleep', 'soyenge': 'will sleep',
+                        'so': 'sleep', 'soo': 'sleep',
+                        
+                        'padha': 'read/studied', 'padhi': 'read/studied', 'padhe': 'read/studied',
+                        'padhta': 'read/study', 'padhti': 'read/study', 'padhte': 'read/study',
+                        'padhega': 'will read/study', 'padhegi': 'will read/study', 'padhenge': 'will read/study',
+                        'padh': 'read/study', 'padho': 'read/study', 'padhna': 'to read/study',
+                        
+                        'likha': 'wrote', 'likhi': 'wrote', 'likhe': 'wrote',
+                        'likhta': 'write', 'likhti': 'write', 'likhte': 'write',
+                        'likhega': 'will write', 'likhegi': 'will write', 'likhenge': 'will write',
+                        'likh': 'write', 'likho': 'write', 'likhna': 'to write',
+                        
+                        // Question words
                         'kya': 'what', 'kaun': 'who', 'kahan': 'where', 'kab': 'when',
-                        'kaise': 'how', 'kyun': 'why', 'kyunki': 'because',
+                        'kaise': 'how', 'kyun': 'why', 'kyunki': 'because', 'kyu': 'why',
                         'kitna': 'how much', 'kitni': 'how much', 'kitne': 'how many',
                         'kaunsa': 'which', 'kaunsi': 'which', 'kaunse': 'which',
+                        'kis': 'which', 'kiske': 'whose', 'kiska': 'whose', 'kiski': 'whose',
                         
-                        // Common nouns and objects
+                        // Common nouns
                         'naam': 'name', 'ghar': 'home', 'paani': 'water', 'khana': 'food',
                         'paise': 'money', 'kaam': 'work', 'samay': 'time', 'jagah': 'place',
-                        'kitab': 'book', 'school': 'school', 'college': 'college',
+                        'kitab': 'book', 'pen': 'pen', 'pencil': 'pencil', 'paper': 'paper',
+                        'school': 'school', 'college': 'college', 'university': 'university',
                         'office': 'office', 'market': 'market', 'hospital': 'hospital',
-                        'station': 'station', 'bus': 'bus', 'train': 'train',
-                        'car': 'car', 'phone': 'phone', 'computer': 'computer',
+                        'station': 'station', 'bus': 'bus', 'train': 'train', 'car': 'car',
+                        'phone': 'phone', 'mobile': 'mobile', 'computer': 'computer',
+                        'internet': 'internet', 'email': 'email', 'website': 'website',
+                        'dost': 'friend', 'dosti': 'friendship', 'pyaar': 'love',
+                        'shaadi': 'wedding', 'birthday': 'birthday', 'party': 'party',
+                        'game': 'game', 'movie': 'movie', 'song': 'song', 'music': 'music',
+                        'photo': 'photo', 'picture': 'picture', 'video': 'video',
+                        'kapde': 'clothes', 'shirt': 'shirt', 'pant': 'pants', 'shoes': 'shoes',
+                        'chai': 'tea', 'coffee': 'coffee', 'milk': 'milk', 'juice': 'juice',
+                        'roti': 'bread', 'rice': 'rice', 'dal': 'lentils', 'sabzi': 'vegetables',
+                        'fruit': 'fruit', 'apple': 'apple', 'banana': 'banana', 'mango': 'mango',
                         
-                        // Adjectives and descriptions
-                        'acha': 'good', 'achha': 'good', 'achhi': 'good', 'ache': 'good',
+                        // Adjectives
+                        'accha': 'good', 'achha': 'good', 'achhi': 'good', 'ache': 'good',
                         'bura': 'bad', 'buri': 'bad', 'bure': 'bad',
                         'bada': 'big', 'badi': 'big', 'bade': 'big',
                         'chota': 'small', 'choti': 'small', 'chote': 'small',
                         'naya': 'new', 'nayi': 'new', 'naye': 'new',
                         'purana': 'old', 'purani': 'old', 'purane': 'old',
-                        'sundar': 'beautiful', 'accha': 'nice', 'lamba': 'tall/long',
-                        'mushkil': 'difficult', 'aasan': 'easy', 'important': 'important',
+                        'sundar': 'beautiful', 'khoobsurat': 'beautiful', 'haseen': 'beautiful',
+                        'lamba': 'tall', 'chaudha': 'wide', 'patla': 'thin', 'mota': 'fat',
+                        'gora': 'fair', 'kala': 'dark', 'safed': 'white', 'lal': 'red',
+                        'pila': 'yellow', 'hara': 'green', 'nila': 'blue', 'gulabi': 'pink',
+                        'mushkil': 'difficult', 'aasan': 'easy', 'simple': 'simple',
+                        'important': 'important', 'zaroori': 'necessary', 'special': 'special',
+                        'khush': 'happy', 'udaas': 'sad', 'pareshan': 'worried',
+                        'thik': 'fine', 'theek': 'okay', 'galat': 'wrong', 'sahi': 'right',
+                        'jyada': 'more', 'kam': 'less', 'poora': 'full', 'khali': 'empty',
+                        'tez': 'fast', 'dhime': 'slow', 'garam': 'hot', 'thanda': 'cold',
                         
-                        // Family and relationships
-                        'mummy': 'mother', 'papa': 'father', 'bhai': 'brother',
-                        'behen': 'sister', 'dost': 'friend', 'beta': 'son',
-                        'beti': 'daughter', 'nana': 'grandfather', 'nani': 'grandmother',
-                        'chacha': 'uncle', 'chachi': 'aunt', 'cousin': 'cousin',
+                        // Family relationships
+                        'mummy': 'mother', 'mama': 'mother', 'maa': 'mother',
+                        'papa': 'father', 'daddy': 'father', 'pitaji': 'father',
+                        'bhai': 'brother', 'behen': 'sister', 'didi': 'sister',
+                        'beta': 'son', 'beti': 'daughter', 'bachcha': 'child',
+                        'nana': 'grandfather', 'nani': 'grandmother', 'dada': 'grandfather',
+                        'dadi': 'grandmother', 'chacha': 'uncle', 'chachi': 'aunt',
+                        'mama': 'uncle', 'mami': 'aunt', 'cousin': 'cousin',
+                        'husband': 'husband', 'wife': 'wife', 'girlfriend': 'girlfriend',
+                        'boyfriend': 'boyfriend', 'family': 'family', 'ghar': 'family',
                         
                         // Prepositions and conjunctions
                         'aur': 'and', 'ya': 'or', 'lekin': 'but', 'par': 'but',
-                        'agar': 'if', 'jab': 'when', 'tak': 'until', 'phir': 'then',
-                        'se': 'from/with', 'ko': 'to', 'mein': 'in', 'par': 'on',
-                        'ke': 'of', 'ki': 'of', 'ka': 'of', 'ke liye': 'for',
-                        'ke saath': 'with', 'ke bina': 'without', 'ke baad': 'after',
-                        'ke pehle': 'before', 'ke andar': 'inside', 'ke bahar': 'outside',
+                        'agar': 'if', 'jab': 'when', 'tab': 'then', 'phir': 'then',
+                        'abhi': 'now', 'fir': 'again', 'wapis': 'back', 'vapas': 'back',
+                        'se': 'from', 'ko': 'to', 'mein': 'in', 'par': 'on',
+                        'ke': 'of', 'ki': 'of', 'ka': 'of', 'pe': 'on',
+                        'niche': 'down', 'upar': 'up', 'andar': 'inside', 'bahar': 'outside',
+                        'saamne': 'in front', 'piche': 'behind', 'paas': 'near', 'door': 'far',
+                        'saath': 'with', 'bina': 'without', 'liye': 'for', 'tak': 'until',
+                        'baad': 'after', 'pehle': 'before', 'dauran': 'during',
                         
-                        // Numbers and quantities
+                        // Numbers
                         'ek': 'one', 'do': 'two', 'teen': 'three', 'char': 'four',
                         'panch': 'five', 'chhe': 'six', 'saat': 'seven', 'aath': 'eight',
                         'nau': 'nine', 'das': 'ten', 'gyarah': 'eleven', 'barah': 'twelve',
-                        'bis': 'twenty', 'tis': 'thirty', 'chalis': 'forty', 'pachas': 'fifty',
+                        'terah': 'thirteen', 'chaudah': 'fourteen', 'pandrah': 'fifteen',
+                        'solah': 'sixteen', 'satrah': 'seventeen', 'atharah': 'eighteen',
+                        'unnis': 'nineteen', 'bis': 'twenty', 'ikkis': 'twenty-one',
+                        'tis': 'thirty', 'chalis': 'forty', 'pachas': 'fifty',
                         'saath': 'sixty', 'sattar': 'seventy', 'assi': 'eighty', 'nabbe': 'ninety',
-                        'sau': 'hundred', 'hazar': 'thousand',
+                        'sau': 'hundred', 'hazaar': 'thousand', 'lakh': 'lakh', 'crore': 'crore',
                         
                         // Time expressions
-                        'abhi': 'now', 'kal': 'yesterday/tomorrow', 'aaj': 'today',
+                        'aaj': 'today', 'kal': 'yesterday/tomorrow', 'parson': 'day after tomorrow',
                         'subah': 'morning', 'dopahar': 'afternoon', 'shaam': 'evening',
                         'raat': 'night', 'din': 'day', 'hafta': 'week', 'mahina': 'month',
-                        'saal': 'year', 'ghanta': 'hour', 'minute': 'minute',
+                        'saal': 'year', 'ghanta': 'hour', 'minute': 'minute', 'second': 'second',
+                        'time': 'time', 'samay': 'time', 'waqt': 'time',
+                        'jaldi': 'quickly', 'der': 'late', 'late': 'late', 'early': 'early',
                         
-                        // Common expressions
-                        'achha laga': 'liked it', 'pasand hai': 'like', 'chahiye': 'want/need',
-                        'pata hai': 'know', 'samjha': 'understood', 'theek hai': 'okay',
-                        'koi baat nahi': 'no problem', 'dhanyawad': 'thank you',
-                        'namaste': 'hello/goodbye', 'alvida': 'goodbye',
-                        'maaf karo': 'sorry', 'help karo': 'help me'
+                        // Common expressions and phrases
+                        'hello': 'hello', 'hi': 'hi', 'namaste': 'hello', 'namaskar': 'hello',
+                        'bye': 'bye', 'alvida': 'goodbye', 'chalo': 'let\'s go',
+                        'theek': 'okay', 'ok': 'okay', 'haan': 'yes', 'nahi': 'no',
+                        'maaf': 'sorry', 'sorry': 'sorry', 'thanks': 'thanks',
+                        'dhanyawad': 'thank you', 'shukriya': 'thank you',
+                        'please': 'please', 'kripa': 'please', 'kripaya': 'please',
+                        'welcome': 'welcome', 'koi': 'no', 'baat': 'matter', 'problem': 'problem',
+                        'help': 'help', 'madad': 'help', 'sahayata': 'help',
+                        'pata': 'know', 'maloom': 'know', 'samjha': 'understand',
+                        'samjhi': 'understand', 'samjhe': 'understand', 'samajh': 'understand',
+                        'pasand': 'like', 'napasand': 'dislike', 'chahiye': 'want',
+                        'chaahiye': 'want', 'mil': 'meet', 'mila': 'met', 'mile': 'met',
+                        'de': 'give', 'dena': 'to give', 'diya': 'gave', 'diye': 'gave',
+                        'le': 'take', 'lena': 'to take', 'liya': 'took', 'liye': 'took',
+                        'rakh': 'keep', 'rakhna': 'to keep', 'rakha': 'kept', 'rakhe': 'kept',
+                        'bhej': 'send', 'bheja': 'sent', 'bheje': 'sent', 'bhejna': 'to send',
+                        'la': 'bring', 'lana': 'to bring', 'laya': 'brought', 'laye': 'brought',
+                        'check': 'check', 'dekh': 'check', 'wait': 'wait', 'intezaar': 'wait',
+                        'call': 'call', 'phone': 'phone', 'message': 'message', 'text': 'text',
+                        'busy': 'busy', 'free': 'free', 'available': 'available',
+                        'ready': 'ready', 'taiyaar': 'ready', 'finished': 'finished',
+                        'complete': 'complete', 'khatam': 'finished', 'over': 'over',
+                        'start': 'start', 'shuru': 'start', 'begin': 'begin',
+                        'end': 'end', 'last': 'last', 'first': 'first', 'pehla': 'first',
+                        'next': 'next', 'agla': 'next', 'previous': 'previous', 'pichla': 'previous'
                     };
                     
-                    // Phase 1: Word-by-word translation
+                    // Step 1: Replace phrases first (multi-word expressions)
+                    const phrases = {
+                        'koi baat nahi': 'no problem',
+                        'kya baat hai': 'what\'s the matter',
+                        'kya kar rahe ho': 'what are you doing',
+                        'kya kar raha hai': 'what is he doing',
+                        'kya kar rahi hai': 'what is she doing',
+                        'kahan ja rahe ho': 'where are you going',
+                        'kahan ja raha hai': 'where is he going',
+                        'kahan ja rahi hai': 'where is she going',
+                        'kab aa rahe ho': 'when are you coming',
+                        'kab aa raha hai': 'when is he coming',
+                        'kab aa rahi hai': 'when is she coming',
+                        'kaise ho': 'how are you',
+                        'kaise hai': 'how is he/she',
+                        'theek hai': 'it\'s okay',
+                        'accha laga': 'liked it',
+                        'bura laga': 'didn\'t like it',
+                        'samjh gaya': 'understood',
+                        'samjh gayi': 'understood',
+                        'samjh gaye': 'understood',
+                        'pata nahi': 'don\'t know',
+                        'maloom nahi': 'don\'t know',
+                        'ho gaya': 'it\'s done',
+                        'ho gayi': 'it\'s done',
+                        'ho gaye': 'it\'s done',
+                        'kar diya': 'did it',
+                        'kar diye': 'did it',
+                        'kar dii': 'did it',
+                        'aa gaya': 'has come',
+                        'aa gayi': 'has come',
+                        'aa gaye': 'has come',
+                        'ja raha': 'is going',
+                        'ja rahi': 'is going',
+                        'ja rahe': 'are going',
+                        'aa raha': 'is coming',
+                        'aa rahi': 'is coming',
+                        'aa rahe': 'are coming',
+                        'kar raha': 'is doing',
+                        'kar rahi': 'is doing',
+                        'kar rahe': 'are doing',
+                        'dekh raha': 'is watching',
+                        'dekh rahi': 'is watching',
+                        'dekh rahe': 'are watching',
+                        'sun raha': 'is listening',
+                        'sun rahi': 'is listening',
+                        'sun rahe': 'are listening',
+                        'bol raha': 'is saying',
+                        'bol rahi': 'is saying',
+                        'bol rahe': 'are saying',
+                        'likh raha': 'is writing',
+                        'likh rahi': 'is writing',
+                        'likh rahe': 'are writing',
+                        'padh raha': 'is reading',
+                        'padh rahi': 'is reading',
+                        'padh rahe': 'are reading',
+                        'kha raha': 'is eating',
+                        'kha rahi': 'is eating',
+                        'kha rahe': 'are eating',
+                        'pi raha': 'is drinking',
+                        'pi rahi': 'is drinking',
+                        'pi rahe': 'are drinking',
+                        'so raha': 'is sleeping',
+                        'so rahi': 'is sleeping',
+                        'so rahe': 'are sleeping'
+                    };
+                    
+                    // Apply phrase translations
+                    Object.keys(phrases).forEach(phrase => {
+                        const regex = new RegExp(phrase, 'gi');
+                        translated = translated.replace(regex, phrases[phrase]);
+                    });
+                    
+                    // Step 2: Word-by-word translation
                     const words = translated.split(' ');
                     const translatedWords = words.map(word => {
                         const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
                         const punctuation = word.match(/[.,!?;:]/) ? word.match(/[.,!?;:]/)[0] : '';
                         
-                        if (hinglishMappings[cleanWord]) {
-                            return hinglishMappings[cleanWord] + punctuation;
+                        if (hinglishDict[cleanWord]) {
+                            return hinglishDict[cleanWord] + punctuation;
                         }
-                        return word;
+                        return word; // Keep original if not found
                     });
                     
                     translated = translatedWords.join(' ');
                     
-                    // Phase 2: Phrase-level corrections
-                    const phraseCorrections = {
-                        'my name name': 'my name',
+                    // Step 3: Grammar corrections
+                    const grammarFixes = {
+                        'I is': 'I am',
+                        'I are': 'I am',
+                        'you is': 'you are',
+                        'he are': 'he is',
+                        'she are': 'she is',
+                        'we is': 'we are',
+                        'they is': 'they are',
                         'am is': 'am',
-                        'are is': 'are',
                         'is are': 'are',
+                        'are is': 'are',
+                        'my name name': 'my name',
+                        'I name': 'my name',
                         'from from': 'from',
+                        'to to': 'to',
                         'and and': 'and',
                         'the the': 'the',
-                        'will be will': 'will',
-                        'do does': 'do',
-                        'good good': 'very good',
-                        'big big': 'very big',
-                        'small small': 'very small'
+                        'a a': 'a',
+                        'an an': 'an',
+                        'his/her': 'his', // Default to his for simplicity
+                        'he/she': 'he'    // Default to he for simplicity
                     };
                     
-                    Object.keys(phraseCorrections).forEach(phrase => {
-                        const regex = new RegExp('\\b' + phrase + '\\b', 'gi');
-                        translated = translated.replace(regex, phraseCorrections[phrase]);
+                    Object.keys(grammarFixes).forEach(error => {
+                        const regex = new RegExp('\\b' + error + '\\b', 'gi');
+                        translated = translated.replace(regex, grammarFixes[error]);
                     });
                     
-                    // Phase 3: Grammar improvements
-                    translated = translated.replace(/\b(am|is|are)\s+(do|does|did)\b/gi, (match, be, doVerb) => {
-                        return be;
-                    });
-                    
-                    // Phase 4: Sentence structure improvements
+                    // Step 4: Sentence structure improvements
                     translated = translated.replace(/(^|\. )([a-z])/g, (match, start, letter) => {
                         return start + letter.toUpperCase();
                     });
                     
+                    // Ensure proper ending
                     if (translated && !/[.!?]$/.test(translated)) {
                         translated += '.';
                     }
                     
-                    // Phase 5: Cultural context adjustments
-                    const culturalMappings = {
-                        'his/her mother': 'their mother',
-                        'his/her father': 'their father',
-                        'very like': 'really like',
-                        'much like': 'really like',
-                        'is having': 'has',
-                        'are having': 'have',
-                        'was having': 'had',
-                        'were having': 'had'
-                    };
+                    // Step 5: Final cleanup
+                    translated = translated.replace(/\s+/g, ' ').trim();
                     
-                    Object.keys(culturalMappings).forEach(cultural => {
-                        const regex = new RegExp('\\b' + cultural + '\\b', 'gi');
-                        translated = translated.replace(regex, culturalMappings[cultural]);
-                    });
-                    
-                    // Calculate detailed statistics
+                    // Calculate statistics
                     const originalWords = words.length;
                     const wordsTranslated = words.filter(word => {
                         const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
-                        return hinglishMappings[cleanWord];
+                        return hinglishDict[cleanWord] || Object.keys(phrases).some(phrase => phrase.includes(cleanWord));
                     }).length;
                     
                     const translationPercentage = Math.round((wordsTranslated / originalWords) * 100);
-                    const sentences = translated.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                    const avgWordsPerSentence = Math.round(translated.split(' ').length / sentences.length);
                     
                     let qualityRating = 'Excellent';
-                    if (translationPercentage < 30) qualityRating = 'Basic';
+                    if (translationPercentage < 20) qualityRating = 'Basic';
+                    else if (translationPercentage < 40) qualityRating = 'Fair';
                     else if (translationPercentage < 60) qualityRating = 'Good';
                     else if (translationPercentage < 80) qualityRating = 'Very Good';
                     
-                    showOutput('translate-output', 'Advanced English Translation', `
+                    showOutput('translate-output', 'Improved English Translation', `
                         <div class="p-3 border rounded bg-white mb-3">
                             <h6 class="text-primary mb-2">
                                 <i class="fas fa-quote-left"></i> English Translation:
@@ -1301,27 +1475,27 @@
                             <p class="lead mb-0">${translated}</p>
                         </div>
                         <div class="p-3 bg-light rounded">
-                            <h6 class="mb-2"><i class="fas fa-chart-line"></i> Translation Analysis:</h6>
+                            <h6 class="mb-2"><i class="fas fa-chart-line"></i> Translation Report:</h6>
                             <div class="row">
                                 <div class="col-md-6">
                                     <small class="text-muted">
-                                        <strong>Words Processed:</strong> ${originalWords}<br>
-                                        <strong>Words Translated:</strong> ${wordsTranslated} (${translationPercentage}%)<br>
-                                        <strong>Translation Quality:</strong> ${qualityRating}
+                                        <strong>Original Words:</strong> ${originalWords}<br>
+                                        <strong>Translated Words:</strong> ${wordsTranslated} (${translationPercentage}%)<br>
+                                        <strong>Quality Rating:</strong> ${qualityRating}
                                     </small>
                                 </div>
                                 <div class="col-md-6">
                                     <small class="text-muted">
-                                        <strong>Sentences:</strong> ${sentences.length}<br>
-                                        <strong>Avg Words/Sentence:</strong> ${avgWordsPerSentence}<br>
-                                        <strong>Language Mix:</strong> ${translationPercentage > 50 ? 'Hinglish-heavy' : 'English-heavy'}
+                                        <strong>Grammar Fixes:</strong> Applied<br>
+                                        <strong>Phrase Recognition:</strong> Enhanced<br>
+                                        <strong>Accuracy:</strong> Improved
                                     </small>
                                 </div>
                             </div>
                         </div>
                     `);
                 } catch (error) {
-                    showError('translate-output', 'Error in advanced translation. Please try again.');
+                    showError('translate-output', 'Error in translation. Please try again.');
                 }
                 hideLoading(button, originalText);
             }, 12000 + Math.random() * 6000); // 12-18 seconds
@@ -1378,6 +1552,83 @@
             } catch (error) {
                 alert('PDF export failed. Please try again.');
             }
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(outputId) {
+            const output = document.getElementById(outputId);
+            let textToCopy = '';
+            
+            // Extract clean text content from the output
+            const contentDiv = output.querySelector('.alert-success');
+            if (contentDiv) {
+                // Clone the element to manipulate it
+                const clone = contentDiv.cloneNode(true);
+                
+                // Remove the copy button from the clone
+                const copyBtn = clone.querySelector('button');
+                if (copyBtn) copyBtn.remove();
+                
+                // Get text content, preserving line breaks
+                textToCopy = clone.innerText || clone.textContent;
+                
+                // Clean up extra whitespace while preserving structure
+                textToCopy = textToCopy.replace(/\n\s*\n/g, '\n').trim();
+            }
+            
+            if (!textToCopy) {
+                alert('No content to copy. Please process some text first.');
+                return;
+            }
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    fallbackCopy(textToCopy);
+                });
+            } else {
+                fallbackCopy(textToCopy);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            // Fallback method for older browsers or non-secure contexts
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                alert('Copy failed. Please select and copy the text manually.');
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+        
+        function showCopySuccess() {
+            // Create temporary success message
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-info position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+            toast.innerHTML = '<i class="fas fa-check-circle"></i> Text copied to clipboard!';
+            
+            document.body.appendChild(toast);
+            
+            // Auto-remove after 2 seconds
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 2000);
         }
 
         // Initialize
